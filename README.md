@@ -1,3 +1,13 @@
 # Café Tuscaney Frontend
 
-React SPA for customizable orders.
+React + Vite + Tailwind SPA that renders builders from menu config and talks to the API.
+
+## Env
+VITE_API_BASE_URL=...
+VITE_COGNITO_USER_POOL_ID=...
+VITE_COGNITO_CLIENT_ID=...
+VITE_COGNITO_DOMAIN=...
+
+## Pages
+
+Home, Build Sandwich, Build Salad, Build Soup, Build Drink, Combos, Cart, Order Status, Admin (protected). Uses React Context for cart state.
