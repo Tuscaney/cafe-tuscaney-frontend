@@ -98,7 +98,10 @@ export default function App() {
     if (!items.length) return null;
 
     return (
-      <ul>
+      <ul
+        style={{ listStyleType: "square" }}
+        className="mt-2 ml-5 space-y-1 text-sm text-slate-800"
+      >
         {items.map((item, index) => {
           const label =
             item.type && item.type.length
@@ -116,7 +119,7 @@ export default function App() {
 
           return (
             <li key={index}>
-              <strong>{label}</strong>
+              <span className="font-semibold">{label}</span>
               {parts.length > 0 && " — " + parts.join("; ")}
             </li>
           );
@@ -125,75 +128,64 @@ export default function App() {
     );
   }
 
+  // Tailwind classes for the flash banner (success/error/info)
+  const flashClass =
+    flash?.type === "error"
+      ? "mt-3 mb-4 px-3 py-2 rounded-md text-sm border bg-red-50 border-red-200 text-red-800"
+      : flash?.type === "success"
+      ? "mt-3 mb-4 px-3 py-2 rounded-md text-sm border bg-emerald-50 border-emerald-200 text-emerald-800"
+      : "mt-3 mb-4 px-3 py-2 rounded-md text-sm border bg-amber-50 border-amber-200 text-amber-800";
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Café Tuscaney</h1>
-      <p>Build-your-own items from a config-driven menu.</p>
-
-      {/* Small inline "toast" banner (no popup) */}
-      {flash && (
-        <div
-          style={{
-            marginTop: "12px",
-            marginBottom: "16px",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            fontSize: "0.9rem",
-            backgroundColor:
-              flash.type === "error" ? "#fee2e2" : "#dcfce7",
-            border:
-              flash.type === "error"
-                ? "1px solid #fecaca"
-                : "1px solid #bbf7d0",
-          }}
-        >
-          {flash.message}
-        </div>
-      )}
-
-      <hr />
-
-      {/* Order of sections: Sandwich, Soup, Salad, Drink, Sweet */}
-      <MenuSection
-        title="Sandwich"
-        itemType="sandwich"
-        item={menu.sandwich}
-      />
-      <MenuSection title="Soup" itemType="soup" item={menu.soup} />
-      <MenuSection title="Salad" itemType="salad" item={menu.salad} />
-      <MenuSection title="Drink" itemType="drink" item={menu.drink} />
-      <MenuSection
-        title="Sweet Treat"
-        itemType="sweet"
-        item={menu.sweet}
-      />
-
-      <hr />
-      <h3>Cart: {items.length} item(s)</h3>
-      {renderCartSummary()}
-      {orderMessage && (
-        <p style={{ marginTop: "4px", fontSize: "0.9rem" }}>
-          {orderMessage}
+    <div className="min-h-screen bg-stone-100 text-slate-900">
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <h1 className="text-3xl font-bold tracking-tight text-amber-900">
+          Café Tuscaney
+        </h1>
+        <p className="mt-1 text-sm text-slate-700">
+          Build-your-own items from a config-driven menu.
         </p>
-      )}
 
-      {items.length > 0 && (
-        <button
-          type="button"
-          onClick={placeOrder}
-          style={{
-            marginTop: "8px",
-            padding: "8px 16px",
-            borderRadius: "999px",
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Place Order
-        </button>
-      )}
+        {/* Small inline "toast" banner (no popup) */}
+        {flash && <div className={flashClass}>{flash.message}</div>}
+
+        <div className="my-6 h-px bg-stone-300" />
+
+        {/* Order of sections: Sandwich, Soup, Salad, Drink, Sweet */}
+        <MenuSection
+          title="Sandwich"
+          itemType="sandwich"
+          item={menu.sandwich}
+        />
+        <MenuSection title="Soup" itemType="soup" item={menu.soup} />
+        <MenuSection title="Salad" itemType="salad" item={menu.salad} />
+        <MenuSection title="Drink" itemType="drink" item={menu.drink} />
+        <MenuSection
+          title="Sweet Treat"
+          itemType="sweet"
+          item={menu.sweet}
+        />
+
+        <div className="my-6 h-px bg-stone-300" />
+
+        <h3 className="text-lg font-semibold">
+          Cart: {items.length} item(s)
+        </h3>
+        {renderCartSummary()}
+        {orderMessage && (
+          <p className="mt-1 text-xs text-slate-700">{orderMessage}</p>
+        )}
+
+        {items.length > 0 && (
+          <button
+            type="button"
+            onClick={placeOrder}
+            className="mt-3 inline-flex items-center rounded-full bg-amber-700 px-5 py-2 text-sm font-medium text-amber-50 shadow-sm hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1"
+          >
+            Place Order
+          </button>
+        )}
+      </div>
     </div>
   );
 }
