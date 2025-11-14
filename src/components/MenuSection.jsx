@@ -1,30 +1,75 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 
-// This component renders one menu section (e.g. Sandwich, Soup).
-// It shows each option group with radio/checkbox inputs
-// and saves the user's selections into the cart.
+// This controls the order instead of relying on DynamoDB.
+const GROUP_ORDER = {
+  sandwich: ["Bread", "Meat", "Extra Meat", "Cheese", "Lettuce", "Veggies", "Condiments"],
+  soup: ["Broth", "Proteins", "Vegetables"],
+  salad: [
+    "Lettuce Base",
+    "Veggies",
+    "Fruits",
+    "Proteins",
+    "Nuts",
+    "Seeds",
+    "Cheeses",
+    "Grains",
+    "Fresh Herbs",
+  ],
+  drink: ["Base", "Flavors", "Modifier"],
+  sweet: ["Treats"],
+};
+
+// Helper to sort groups into a human-friendly order.
+function getOrderedGroups(itemType, groups) {
+  const entries = Object.entries(groups);
+  const order = GROUP_ORDER[itemType] || [];
+
+  return entries.sort(([nameA], [nameB]) => {
+    const indexA = order.indexOf(nameA);
+    const indexB = order.indexOf(nameB);
+
+    // If both are in the order list, sort by that index.
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+    // If only one is in the list, that one goes first.
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    // Otherwise, fall back to alphabetical.
+    return nameA.localeCompare(nameB);
+  });
+}
+
+// This component renders one builder section (Sandwich, Soup, Salad, etc.).
+// It shows each group and each option inside that group.
+// All inputs are checkboxes (square), even for single-choice groups.
 export default function MenuSection({ title, itemType, item }) {
   const { addItem } = useCart();
 
-  // Local state to track what the user picked in this section.
-  // Example shape: { Bread: "wheat", Veggies: ["tomato", "onion"] }
+  // Example shape:
+  // { Bread: "wheat", Veggies: ["tomato", "onion"] }
   const [selections, setSelections] = useState({});
 
-  // If this item type has no meta info yet, don't render anything.
   if (!item || !item.meta) return null;
 
   const { meta, groups } = item;
 
-  // For groups that should only allow one choice (type = "single").
+  // Single-choice groups (type = "single") still only store one value,
+  // but shows it with a checkbox for a consistent "square" look.
   function handleSingleChange(groupName, optionId) {
-    setSelections((prev) => ({
-      ...prev,
-      [groupName]: optionId
-    }));
+    setSelections((prev) => {
+      // If the same option is clicked again, allow unchecking it.
+      const current = prev[groupName];
+      if (current === optionId) {
+        return { ...prev, [groupName]: undefined };
+      }
+      return {
+        ...prev,
+        [groupName]: optionId,
+      };
+    });
   }
 
-  // For groups that allow multiple choices (type = "multi").
+  // Multi-choice groups (type = "multi") store an array of ids.
   function handleMultiChange(groupName, optionId) {
     setSelections((prev) => {
       const current = Array.isArray(prev[groupName]) ? prev[groupName] : [];
@@ -34,25 +79,25 @@ export default function MenuSection({ title, itemType, item }) {
         ...prev,
         [groupName]: exists
           ? current.filter((id) => id !== optionId) // uncheck
-          : [...current, optionId] // check
+          : [...current, optionId], // check
       };
     });
   }
 
-  // When the user clicks "Add to Cart", stores:
-  // - the type (sandwich, soup, etc.)
-  // - the base price from meta
-  // - all of their selections from this section
+  // When "Add to Cart" is clicked, the type, base price,
+  // and all selections from this section are stored.
   function handleAddToCart() {
     const cartItem = {
       type: meta.category || itemType,
       basePrice: meta.basePrice,
-      selections
+      selections,
     };
 
     addItem(cartItem);
     alert(`Added ${title} to cart!`);
   }
+
+  const orderedGroups = getOrderedGroups(itemType, groups);
 
   return (
     <section style={{ marginBottom: "40px" }}>
@@ -61,15 +106,12 @@ export default function MenuSection({ title, itemType, item }) {
         <strong>Base price:</strong> ${meta.basePrice.toFixed(2)}
       </p>
 
-      {Object.entries(groups).map(([groupName, group]) => {
-        // group.definition.type comes from DynamoDB (single | multi)
+      {orderedGroups.map(([groupName, group]) => {
         const type = group.definition?.type || "single";
         const isSingle = type === "single";
 
         const selectedValue = selections[groupName];
-        const selectedArray = Array.isArray(selectedValue)
-          ? selectedValue
-          : [];
+        const selectedArray = Array.isArray(selectedValue) ? selectedValue : [];
 
         return (
           <div key={groupName} style={{ marginTop: "16px" }}>
@@ -77,8 +119,6 @@ export default function MenuSection({ title, itemType, item }) {
 
             <div style={{ marginTop: "8px" }}>
               {group.options.map((option) => {
-                // input "name" keeps radios grouped by item+group
-                const inputName = `${itemType}-${groupName}`;
                 const checked = isSingle
                   ? selectedValue === option.id
                   : selectedArray.includes(option.id);
@@ -91,12 +131,12 @@ export default function MenuSection({ title, itemType, item }) {
                       alignItems: "center",
                       marginRight: "12px",
                       marginBottom: "8px",
-                      fontSize: "0.9rem"
+                      fontSize: "0.9rem",
                     }}
                   >
                     <input
-                      type={isSingle ? "radio" : "checkbox"}
-                      name={inputName}
+                      type="checkbox" // always checkbox for square bullets
+                      name={`${itemType}-${groupName}-${option.id}`}
                       value={option.id}
                       checked={checked}
                       onChange={() =>
@@ -132,7 +172,7 @@ export default function MenuSection({ title, itemType, item }) {
           border: "none",
           backgroundColor: "#16a34a",
           color: "white",
-          cursor: "pointer"
+          cursor: "pointer",
         }}
       >
         Add {title} to Cart
@@ -140,3 +180,4 @@ export default function MenuSection({ title, itemType, item }) {
     </section>
   );
 }
+
