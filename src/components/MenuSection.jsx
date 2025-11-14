@@ -61,7 +61,7 @@ const DRINK_OTHER_FLAVORS = new Set([
 const SOFT_CHEESE_IDS = new Set(["feta", "goat", "bleu", "burrata"]);
 const HARD_CHEESE_IDS = new Set(["parmesan", "cheddar", "mozzarella"]);
 
-// Helper: sort groups into a consistent, human-friendly order
+// Helper: sort groups into a consistent order
 function getOrderedGroups(itemType, groups) {
   const entries = Object.entries(groups);
   const order = GROUP_ORDER[itemType] || [];
@@ -78,34 +78,25 @@ function getOrderedGroups(itemType, groups) {
 }
 
 // Helper: render a single checkbox option
-function OptionCheckbox({
-  itemType,
-  groupName,
-  option,
-  checked,
-  onChange,
-}) {
+function OptionCheckbox({ itemType, groupName, option, checked, onChange }) {
   return (
-    <label
-      key={option.id}
-      className="inline-flex items-center mr-3 mb-2 text-sm"
-    >
+    <label key={option.id} className="menu-option">
       <input
         type="checkbox" // always checkbox (square look)
         name={`${itemType}-${groupName}-${option.id}`}
         value={option.id}
         checked={checked}
         onChange={onChange}
-        className="mr-1"
+        className="menu-option-input"
       />
-      {option.label}
+      <span className="menu-option-label">{option.label}</span>
       {option.priceDelta > 0 && (
-        <span className="ml-1 text-xs text-slate-700">
+        <span className="menu-option-price">
           (+${option.priceDelta.toFixed(2)})
         </span>
       )}
       {option.price && option.price > 0 && (
-        <span className="ml-1 text-xs text-slate-700">
+        <span className="menu-option-price">
           (${option.price.toFixed(2)})
         </span>
       )}
@@ -158,7 +149,7 @@ export default function MenuSection({ title, itemType, item }) {
   }
 
   // Add the configured item to the cart.
-  // We no longer use alert() here; App.jsx detects the cart size change
+  // No longer use alert() here; App.jsx detects the cart size change
   // and shows a small inline toast message instead.
   function handleAddToCart() {
     const cartItem = {
@@ -173,206 +164,234 @@ export default function MenuSection({ title, itemType, item }) {
   const orderedGroups = getOrderedGroups(itemType, groups);
 
   return (
-    <section className="mb-10 rounded-lg bg-white p-4 shadow-sm">
-      <h2 className="text-xl font-semibold text-amber-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-700">
-        <span className="font-semibold">Base price:</span>{" "}
-        ${meta.basePrice.toFixed(2)}
+    <section className="menu-section">
+      <h2 className="menu-section-title">{title}</h2>
+      <p className="menu-base-price">
+        <span>Base price:</span> ${meta.basePrice.toFixed(2)}
       </p>
 
-      {orderedGroups.map(([groupName, group]) => {
-        const type = group.definition?.type || "single";
-        const isSingle = type === "single";
+      <div className="menu-groups">
+        {orderedGroups.map(([groupName, group]) => {
+          const type = group.definition?.type || "single";
+          const isSingle = type === "single";
 
-        const selectedValue = selections[groupName];
-        const selectedArray = Array.isArray(selectedValue) ? selectedValue : [];
+          const selectedValue = selections[groupName];
+          const selectedArray = Array.isArray(selectedValue)
+            ? selectedValue
+            : [];
 
-        const options = group.options;
+          const options = group.options;
 
-        // --- SPECIAL ORGANIZATION CASES ---
+          // --- SPECIAL ORGANIZATION CASES ---
 
-        // 1) SWEET TREATS: split by kind (cookies, cakes, etc.)
-        if (itemType === "sweet" && groupName === "Treats") {
-          const buckets = {
-            Cookies: options.filter((o) => o.id.startsWith("cookie-")),
-            Cakes: options.filter((o) => o.id.startsWith("cake-")),
-            "Cinnamon Rolls": options.filter((o) =>
-              o.id.startsWith("cinnamonroll")
-            ),
-            Cheesecake: options.filter((o) =>
-              o.id.startsWith("cheesecake")
-            ),
-            Tarts: options.filter((o) => o.id.startsWith("tart-")),
-            Muffins: options.filter((o) => o.id.startsWith("muffin-")),
-          };
+          // 1) SWEET TREATS: split by kind (cookies, cakes, etc.)
+          if (itemType === "sweet" && groupName === "Treats") {
+            const buckets = {
+              Cookies: options.filter((o) => o.id.startsWith("cookie-")),
+              Cakes: options.filter((o) => o.id.startsWith("cake-")),
+              "Cinnamon Rolls": options.filter((o) =>
+                o.id.startsWith("cinnamonroll")
+              ),
+              Cheesecake: options.filter((o) =>
+                o.id.startsWith("cheesecake")
+              ),
+              Tarts: options.filter((o) => o.id.startsWith("tart-")),
+              Muffins: options.filter((o) => o.id.startsWith("muffin-")),
+            };
 
-          return (
-            <div key={groupName} className="mt-4">
-              <div className="font-semibold text-slate-900">Sweet Treats</div>
-              {Object.entries(buckets).map(([bucketName, bucketOptions]) => {
-                if (!bucketOptions.length) return null;
+            return (
+              <div key={groupName} className="menu-group">
+                <div className="menu-group-title">Sweet Treats</div>
+                <div className="menu-buckets">
+                  {Object.entries(buckets).map(
+                    ([bucketName, bucketOptions]) => {
+                      if (!bucketOptions.length) return null;
 
-                return (
-                  <div key={bucketName} className="mt-2">
-                    <div className="mb-1 text-xs italic text-slate-700">
-                      {bucketName}
-                    </div>
-                    {bucketOptions.map((option) => {
-                      const checked = selectedArray.includes(option.id);
                       return (
-                        <OptionCheckbox
-                          key={option.id}
-                          itemType={itemType}
-                          groupName={groupName}
-                          option={option}
-                          checked={checked}
-                          onChange={() =>
-                            handleMultiChange(groupName, option.id)
-                          }
-                        />
+                        <div key={bucketName} className="menu-bucket">
+                          <div className="menu-bucket-title">
+                            {bucketName}
+                          </div>
+                          <div className="menu-bucket-options">
+                            {bucketOptions.map((option) => {
+                              const checked = selectedArray.includes(
+                                option.id
+                              );
+                              return (
+                                <OptionCheckbox
+                                  key={option.id}
+                                  itemType={itemType}
+                                  groupName={groupName}
+                                  option={option}
+                                  checked={checked}
+                                  onChange={() =>
+                                    handleMultiChange(groupName, option.id)
+                                  }
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
                       );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        }
-
-        // 2) DRINK FLAVORS: Fruit / Herbs & Flowers / Other
-        if (itemType === "drink" && groupName === "Flavors") {
-          const fruit = options.filter((o) => DRINK_FRUIT_FLAVORS.has(o.id));
-          const herbs = options.filter((o) => DRINK_HERB_FLAVORS.has(o.id));
-          const other = options.filter((o) => DRINK_OTHER_FLAVORS.has(o.id));
-
-          const buckets = {
-            "Fruit Flavors": fruit,
-            "Herb & Flower Flavors": herbs,
-            "Other Flavors": other,
-          };
-
-          return (
-            <div key={groupName} className="mt-4">
-              <div className="font-semibold text-slate-900">
-                Flavors (+$0.50 each)
+                    }
+                  )}
+                </div>
               </div>
-              {Object.entries(buckets).map(([bucketName, bucketOptions]) => {
-                if (!bucketOptions.length) return null;
+            );
+          }
 
-                return (
-                  <div key={bucketName} className="mt-2">
-                    <div className="mb-1 text-xs italic text-slate-700">
-                      {bucketName}
-                    </div>
-                    {bucketOptions.map((option) => {
-                      const checked = selectedArray.includes(option.id);
+          // 2) DRINK FLAVORS: Fruit / Herbs & Flowers / Other
+          if (itemType === "drink" && groupName === "Flavors") {
+            const fruit = options.filter((o) => DRINK_FRUIT_FLAVORS.has(o.id));
+            const herbs = options.filter((o) => DRINK_HERB_FLAVORS.has(o.id));
+            const other = options.filter((o) => DRINK_OTHER_FLAVORS.has(o.id));
+
+            const buckets = {
+              "Fruit Flavors": fruit,
+              "Herb & Flower Flavors": herbs,
+              "Other Flavors": other,
+            };
+
+            return (
+              <div key={groupName} className="menu-group">
+                <div className="menu-group-title">
+                  Flavors (+$0.50 each)
+                </div>
+                <div className="menu-buckets">
+                  {Object.entries(buckets).map(
+                    ([bucketName, bucketOptions]) => {
+                      if (!bucketOptions.length) return null;
+
                       return (
-                        <OptionCheckbox
-                          key={option.id}
-                          itemType={itemType}
-                          groupName={groupName}
-                          option={option}
-                          checked={checked}
-                          onChange={() =>
-                            handleMultiChange(groupName, option.id)
-                          }
-                        />
+                        <div key={bucketName} className="menu-bucket">
+                          <div className="menu-bucket-title">
+                            {bucketName}
+                          </div>
+                          <div className="menu-bucket-options">
+                            {bucketOptions.map((option) => {
+                              const checked = selectedArray.includes(
+                                option.id
+                              );
+                              return (
+                                <OptionCheckbox
+                                  key={option.id}
+                                  itemType={itemType}
+                                  groupName={groupName}
+                                  option={option}
+                                  checked={checked}
+                                  onChange={() =>
+                                    handleMultiChange(groupName, option.id)
+                                  }
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
                       );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        }
-
-        // 3) SALAD CHEESES: Crumbled/Soft vs Shredded/Hard
-        if (itemType === "salad" && groupName === "Cheeses") {
-          const soft = options.filter((o) => SOFT_CHEESE_IDS.has(o.id));
-          const hard = options.filter((o) => HARD_CHEESE_IDS.has(o.id));
-
-          const buckets = {
-            "Crumbled / Soft": soft,
-            "Shredded / Hard": hard,
-          };
-
-          return (
-            <div key={groupName} className="mt-4">
-              <div className="font-semibold text-slate-900">Cheeses</div>
-              <div className="mb-1 text-xs text-slate-700">
-                First cheese included, extras +$1
+                    }
+                  )}
+                </div>
               </div>
-              {Object.entries(buckets).map(([bucketName, bucketOptions]) => {
-                if (!bucketOptions.length) return null;
+            );
+          }
 
-                return (
-                  <div key={bucketName} className="mt-2">
-                    <div className="mb-1 text-xs italic text-slate-700">
-                      {bucketName}
-                    </div>
-                    {bucketOptions.map((option) => {
-                      const checked = selectedArray.includes(option.id);
+          // 3) SALAD CHEESES: Crumbled/Soft vs Shredded/Hard
+          if (itemType === "salad" && groupName === "Cheeses") {
+            const soft = options.filter((o) => SOFT_CHEESE_IDS.has(o.id));
+            const hard = options.filter((o) => HARD_CHEESE_IDS.has(o.id));
+
+            const buckets = {
+              "Crumbled / Soft": soft,
+              "Shredded / Hard": hard,
+            };
+
+            return (
+              <div key={groupName} className="menu-group">
+                <div className="menu-group-title">Cheeses</div>
+                <div className="menu-group-note">
+                  First cheese included, extras +$1
+                </div>
+                <div className="menu-buckets">
+                  {Object.entries(buckets).map(
+                    ([bucketName, bucketOptions]) => {
+                      if (!bucketOptions.length) return null;
+
                       return (
-                        <OptionCheckbox
-                          key={option.id}
-                          itemType={itemType}
-                          groupName={groupName}
-                          option={option}
-                          checked={checked}
-                          onChange={() =>
-                            handleMultiChange(groupName, option.id)
-                          }
-                        />
+                        <div key={bucketName} className="menu-bucket">
+                          <div className="menu-bucket-title">
+                            {bucketName}
+                          </div>
+                          <div className="menu-bucket-options">
+                            {bucketOptions.map((option) => {
+                              const checked = selectedArray.includes(
+                                option.id
+                              );
+                              return (
+                                <OptionCheckbox
+                                  key={option.id}
+                                  itemType={itemType}
+                                  groupName={groupName}
+                                  option={option}
+                                  checked={checked}
+                                  onChange={() =>
+                                    handleMultiChange(groupName, option.id)
+                                  }
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
                       );
-                    })}
-                  </div>
-                );
-              })}
+                    }
+                  )}
+                </div>
+              </div>
+            );
+          }
+
+          // Default: normal group rendering (Sandwich, Soup, most Salad groups, etc.)
+          return (
+            <div key={groupName} className="menu-group">
+              <div className="menu-group-title">{groupName}</div>
+
+              <div className="menu-options">
+                {options.map((option) => {
+                  const checked = isSingle
+                    ? selectedValue === option.id
+                    : selectedArray.includes(option.id);
+
+                  const onChange = () =>
+                    isSingle
+                      ? handleSingleChange(groupName, option.id)
+                      : handleMultiChange(groupName, option.id);
+
+                  return (
+                    <OptionCheckbox
+                      key={option.id}
+                      itemType={itemType}
+                      groupName={groupName}
+                      option={option}
+                      checked={checked}
+                      onChange={onChange}
+                    />
+                  );
+                })}
+              </div>
             </div>
           );
-        }
-
-        // Default: normal group rendering (Sandwich, Soup, most Salad groups, etc.)
-        return (
-          <div key={groupName} className="mt-4">
-            <div className="font-semibold text-slate-900">{groupName}</div>
-
-            <div className="mt-2">
-              {options.map((option) => {
-                const checked = isSingle
-                  ? selectedValue === option.id
-                  : selectedArray.includes(option.id);
-
-                const onChange = () =>
-                  isSingle
-                    ? handleSingleChange(groupName, option.id)
-                    : handleMultiChange(groupName, option.id);
-
-                return (
-                  <OptionCheckbox
-                    key={option.id}
-                    itemType={itemType}
-                    groupName={groupName}
-                    option={option}
-                    checked={checked}
-                    onChange={onChange}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+        })}
+      </div>
 
       <button
         type="button"
         onClick={handleAddToCart}
-        className="mt-4 inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+        className="btn-primary"
       >
         Add {title} to Cart
       </button>
     </section>
   );
 }
+
 
 

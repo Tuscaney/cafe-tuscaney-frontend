@@ -2,4 +2,207 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light; }
+:root {
+  color-scheme: light;
+}
+
+/* --- Layout & page shell --- */
+
+.app-root {
+  min-height: 100vh;
+  background-color: #fdfbf2ff; /* warm cream */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.app-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.app-loading {
+  padding: 20px;
+}
+
+/* --- Header --- */
+
+.app-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #fed7aa;
+  text-align: center;
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #92400e; /* café brown/orange */
+}
+
+.app-subtitle {
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+/* --- Toast banner --- */
+
+.toast {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+}
+
+.toast-success {
+  background-color: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.toast-error {
+  background-color: #fee2e2;
+  border-color: #fecaca;
+}
+
+/* --- Individual menu sections ("cards") --- */
+
+.menu-section {
+  margin-bottom: 24px;
+  padding: 16px 18px 20px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.menu-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #92400e; /* brown titles for each item type */
+}
+
+.menu-section-base {
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+/* --- Groups inside a menu section (Bread, Meat, Flavors, etc.) --- */
+
+.menu-group {
+  margin-top: 12px;
+}
+
+.menu-group-title {
+  font-weight: 600;
+  color: #92400e; /* brown group headers */
+  margin-bottom: 4px;
+}
+
+/* Optional note text (e.g., cheese rule) */
+.menu-note {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+/* Subgroup label (e.g., Fruit Flavors, Crumbled / Soft) */
+.menu-subgroup {
+  margin-top: 6px;
+}
+
+.menu-subgroup-label {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+/* Container for options (checkbox labels) */
+.menu-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+/* Option checkbox styling */
+.option-checkbox {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.option-checkbox input[type="checkbox"] {
+  margin-right: 4px;
+}
+
+.option-label-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.option-price {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+/* --- Cart card --- */
+
+.cart-card {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.cart-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.cart-summary {
+  margin-top: 8px;
+  padding-left: 20px;
+  font-size: 0.9rem;
+}
+
+.cart-order-message {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* --- Buttons --- */
+
+.btn-primary {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background-color: #289208ff; /* green button */
+  color: #ffffff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Slight extra spacing for "Add to Cart" buttons */
+.btn-add {
+  margin-top: 16px;
+}
+
