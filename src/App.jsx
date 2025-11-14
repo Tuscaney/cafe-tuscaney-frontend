@@ -18,6 +18,27 @@ export default function App() {
   // CartContext gives us the current cart items and a way to clear them
   const { items, clearCart } = useCart();
 
+  // Small helper to turn the selections object into a short summary string
+  // Example: { Bread: "wheat", Veggies: ["tomato","onion"] }
+  // becomes: "Bread: wheat; Veggies: tomato, onion"
+  function summarizeSelections(selections = {}) {
+    const parts = Object.entries(selections).map(([groupName, value]) => {
+      if (!value) return null;
+
+      if (typeof value === "string") {
+        return `${groupName}: ${value}`;
+      }
+
+      if (Array.isArray(value) && value.length > 0) {
+        return `${groupName}: ${value.join(", ")}`;
+      }
+
+      return null;
+    });
+
+    return parts.filter(Boolean).join("; ");
+  }
+
   // This function sends the current cart to the backend /orders endpoint.
   // For now, the customer info and totals are simple placeholders.
   async function placeOrder() {
@@ -70,22 +91,44 @@ export default function App() {
 
       <hr />
       <h3>Cart: {items.length} item(s)</h3>
+
       {items.length > 0 && (
-        <button
-          type="button"
-          onClick={placeOrder}
-          style={{
-            marginTop: "8px",
-            padding: "8px 16px",
-            borderRadius: "999px",
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Place Order
-        </button>
+        <div style={{ marginTop: "8px", marginBottom: "8px" }}>
+          {/* Tiny order summary so I can read back someone's order during the demo */}
+          <ul style={{ paddingLeft: "1.25rem", marginBottom: "8px" }}>
+            {items.map((item, index) => {
+              const label =
+                item.type.charAt(0).toUpperCase() + item.type.slice(1);
+              const summary = summarizeSelections(item.selections || {});
+
+              return (
+                <li
+                  key={index}
+                  style={{ marginBottom: "4px", fontSize: "0.9rem" }}
+                >
+                  <strong>{label}</strong>
+                  {summary && ` — ${summary}`}
+                </li>
+              );
+            })}
+          </ul>
+
+          <button
+            type="button"
+            onClick={placeOrder}
+            style={{
+              marginTop: "4px",
+              padding: "8px 16px",
+              borderRadius: "999px",
+              border: "none",
+              backgroundColor: "#2563eb",
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            Place Order
+          </button>
+        </div>
       )}
     </div>
   );
