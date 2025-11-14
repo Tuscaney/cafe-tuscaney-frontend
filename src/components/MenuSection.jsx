@@ -163,6 +163,9 @@ export default function MenuSection({ title, itemType, item }) {
     });
   }
 
+  // Add the configured item to the cart.
+  // No longer use alert() here; App.jsx detects the cart size change
+  // and shows a small inline toast message instead.
   function handleAddToCart() {
     const cartItem = {
       type: meta.category || itemType,
@@ -171,7 +174,8 @@ export default function MenuSection({ title, itemType, item }) {
     };
 
     addItem(cartItem);
-    alert(`Added ${title} to cart!`);
+    // 👇 removed browser alert so there is no popup
+    // alert(`Added ${title} to cart!`);
   }
 
   const orderedGroups = getOrderedGroups(itemType, groups);
