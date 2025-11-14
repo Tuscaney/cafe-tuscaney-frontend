@@ -20,6 +20,10 @@ export default function App() {
   // CartContext gives us the current cart items and a way to clear them
   const { items, clearCart } = useCart();
 
+  // Customer info for the order
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+
   // Small "toast" banner at the top of the page
   const [flash, setFlash] = useState(null); // { message, type }
   const flashTimeoutRef = useRef(null);
@@ -50,9 +54,17 @@ export default function App() {
   }, [items.length]);
 
   // Send the current cart to the backend /orders endpoint.
-  // For now, the customer info and totals are still simple placeholders.
   async function placeOrder() {
     if (!items.length) return;
+
+    // simple guard so you don't get empty customer info
+    if (!customerName.trim() || !customerPhone.trim()) {
+      showFlash(
+        "Please enter your name and phone before placing an order.",
+        "error"
+      );
+      return;
+    }
 
     try {
       const url = `${import.meta.env.VITE_API_BASE_URL}/orders`;
@@ -62,8 +74,8 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customer: {
-            name: "Demo Customer",
-            phone: "555-555-5555",
+            name: customerName.trim(),
+            phone: customerPhone.trim(),
           },
           items,
           // These will later be calculated on the backend pricing engine.
@@ -83,6 +95,8 @@ export default function App() {
       setOrderMessage(`Last order ID: ${id}`);
       showFlash("Order placed successfully!", "success");
       clearCart();
+      setCustomerName("");
+      setCustomerPhone("");
     } catch (err) {
       console.error(err);
       setOrderMessage("There was a problem placing your order.");
@@ -166,6 +180,30 @@ export default function App() {
 
         {/* Cart card */}
         <section className="cart-card">
+          {/* Simple customer info form */}
+          <div className="cart-customer">
+            <div className="cart-field">
+              <label htmlFor="customer-name">Name</label>
+              <input
+                id="customer-name"
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Customer name"
+              />
+            </div>
+            <div className="cart-field">
+              <label htmlFor="customer-phone">Phone</label>
+              <input
+                id="customer-phone"
+                type="tel"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                placeholder="555-555-5555"
+              />
+            </div>
+          </div>
+
           <h3 className="cart-title">Cart: {items.length} item(s)</h3>
 
           {renderCartSummary()}
@@ -188,6 +226,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
