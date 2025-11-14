@@ -88,13 +88,7 @@ function OptionCheckbox({
   return (
     <label
       key={option.id}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        marginRight: "12px",
-        marginBottom: "8px",
-        fontSize: "0.9rem",
-      }}
+      className="inline-flex items-center mr-3 mb-2 text-sm"
     >
       <input
         type="checkbox" // always checkbox (square look)
@@ -102,16 +96,16 @@ function OptionCheckbox({
         value={option.id}
         checked={checked}
         onChange={onChange}
-        style={{ marginRight: "4px" }}
+        className="mr-1"
       />
       {option.label}
       {option.priceDelta > 0 && (
-        <span style={{ marginLeft: "4px", fontSize: "0.8rem" }}>
+        <span className="ml-1 text-xs text-slate-700">
           (+${option.priceDelta.toFixed(2)})
         </span>
       )}
       {option.price && option.price > 0 && (
-        <span style={{ marginLeft: "4px", fontSize: "0.8rem" }}>
+        <span className="ml-1 text-xs text-slate-700">
           (${option.price.toFixed(2)})
         </span>
       )}
@@ -164,7 +158,7 @@ export default function MenuSection({ title, itemType, item }) {
   }
 
   // Add the configured item to the cart.
-  // No longer use alert() here; App.jsx detects the cart size change
+  // We no longer use alert() here; App.jsx detects the cart size change
   // and shows a small inline toast message instead.
   function handleAddToCart() {
     const cartItem = {
@@ -174,17 +168,16 @@ export default function MenuSection({ title, itemType, item }) {
     };
 
     addItem(cartItem);
-    // 👇 removed browser alert so there is no popup
-    // alert(`Added ${title} to cart!`);
   }
 
   const orderedGroups = getOrderedGroups(itemType, groups);
 
   return (
-    <section style={{ marginBottom: "40px" }}>
-      <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>{title}</h2>
-      <p>
-        <strong>Base price:</strong> ${meta.basePrice.toFixed(2)}
+    <section className="mb-10 rounded-lg bg-white p-4 shadow-sm">
+      <h2 className="text-xl font-semibold text-amber-900">{title}</h2>
+      <p className="mt-1 text-sm text-slate-700">
+        <span className="font-semibold">Base price:</span>{" "}
+        ${meta.basePrice.toFixed(2)}
       </p>
 
       {orderedGroups.map(([groupName, group]) => {
@@ -214,14 +207,14 @@ export default function MenuSection({ title, itemType, item }) {
           };
 
           return (
-            <div key={groupName} style={{ marginTop: "16px" }}>
-              <div style={{ fontWeight: "600" }}>Sweet Treats</div>
+            <div key={groupName} className="mt-4">
+              <div className="font-semibold text-slate-900">Sweet Treats</div>
               {Object.entries(buckets).map(([bucketName, bucketOptions]) => {
                 if (!bucketOptions.length) return null;
 
                 return (
-                  <div key={bucketName} style={{ marginTop: "8px" }}>
-                    <div style={{ fontStyle: "italic", marginBottom: "4px" }}>
+                  <div key={bucketName} className="mt-2">
+                    <div className="mb-1 text-xs italic text-slate-700">
                       {bucketName}
                     </div>
                     {bucketOptions.map((option) => {
@@ -259,14 +252,16 @@ export default function MenuSection({ title, itemType, item }) {
           };
 
           return (
-            <div key={groupName} style={{ marginTop: "16px" }}>
-              <div style={{ fontWeight: "600" }}>Flavors (+$0.50 each)</div>
+            <div key={groupName} className="mt-4">
+              <div className="font-semibold text-slate-900">
+                Flavors (+$0.50 each)
+              </div>
               {Object.entries(buckets).map(([bucketName, bucketOptions]) => {
                 if (!bucketOptions.length) return null;
 
                 return (
-                  <div key={bucketName} style={{ marginTop: "8px" }}>
-                    <div style={{ fontStyle: "italic", marginBottom: "4px" }}>
+                  <div key={bucketName} className="mt-2">
+                    <div className="mb-1 text-xs italic text-slate-700">
                       {bucketName}
                     </div>
                     {bucketOptions.map((option) => {
@@ -302,17 +297,17 @@ export default function MenuSection({ title, itemType, item }) {
           };
 
           return (
-            <div key={groupName} style={{ marginTop: "16px" }}>
-              <div style={{ fontWeight: "600" }}>Cheeses</div>
-              <div style={{ fontSize: "0.85rem", marginBottom: "4px" }}>
+            <div key={groupName} className="mt-4">
+              <div className="font-semibold text-slate-900">Cheeses</div>
+              <div className="mb-1 text-xs text-slate-700">
                 First cheese included, extras +$1
               </div>
               {Object.entries(buckets).map(([bucketName, bucketOptions]) => {
                 if (!bucketOptions.length) return null;
 
                 return (
-                  <div key={bucketName} style={{ marginTop: "8px" }}>
-                    <div style={{ fontStyle: "italic", marginBottom: "4px" }}>
+                  <div key={bucketName} className="mt-2">
+                    <div className="mb-1 text-xs italic text-slate-700">
                       {bucketName}
                     </div>
                     {bucketOptions.map((option) => {
@@ -339,10 +334,10 @@ export default function MenuSection({ title, itemType, item }) {
 
         // Default: normal group rendering (Sandwich, Soup, most Salad groups, etc.)
         return (
-          <div key={groupName} style={{ marginTop: "16px" }}>
-            <div style={{ fontWeight: "600" }}>{groupName}</div>
+          <div key={groupName} className="mt-4">
+            <div className="font-semibold text-slate-900">{groupName}</div>
 
-            <div style={{ marginTop: "8px" }}>
+            <div className="mt-2">
               {options.map((option) => {
                 const checked = isSingle
                   ? selectedValue === option.id
@@ -372,15 +367,7 @@ export default function MenuSection({ title, itemType, item }) {
       <button
         type="button"
         onClick={handleAddToCart}
-        style={{
-          marginTop: "16px",
-          padding: "8px 16px",
-          borderRadius: "999px",
-          border: "none",
-          backgroundColor: "#16a34a",
-          color: "white",
-          cursor: "pointer",
-        }}
+        className="mt-4 inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
       >
         Add {title} to Cart
       </button>
