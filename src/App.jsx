@@ -145,7 +145,7 @@ export default function App() {
         <header className="app-header">
           <h1 className="app-title">Café Tuscaney</h1>
           <p className="app-subtitle">
-            Build-your-own items from a config-driven menu.
+            Always Made With Love. Always Made Your Way
           </p>
 
           {/* Small inline "toast" banner (no popup) */}
